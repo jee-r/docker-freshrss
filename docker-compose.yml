@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  php:
+    build: ./build/php-fpm/
+    image: freshrss:php-fpm
+    container_name: freshrss_php
+    restart: unless-stopped
+    #networks:
+    #  - bridge
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - freshrss_php:/php
+      - freshrss_app:/app
+      - freshrss_data:/app/FreshRss/data
+      - freshrss_extensions:/app/FreshRss/extensions
+
+  cron:
+    build: ./build/php-fpm/
+    image: freshrss:php-fpm
+    container_name: freshrss_cron
+    restart: unless-stopped
+    #networks:
+    #  - freshrss
+    environment:
+      - CRON=true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - freshrss_php:/php
+      - freshrss_app:/app
+      - freshrss_data:/app/FreshRss/data
+      - freshrss_extensions:/app/FreshRss/extensions
+
+  nginx:
+    build: ./build/nginx
+    image: freshrss:nginx
+    container_name: freshrss_nginx
+    restart: unless-stopped
+    #networks:
+    #  - freshrss
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - freshrss_php:/php
+      - freshrss_app:/app
+    ports:
+      - "8080:8080"
+
+#  db:
+#    image: postgres:alpine
+#    container_name: freshrss_db
+#    restart: unless-stopped
+#    networks:
+#      - freshrss
+#    volumes:
+#      - freshrss_db:/var/lib/postgresql/data
+#    environment:
+#      - POSTGRES_USER=freshrss
+#      - POSTGRES_PASSWORD=freshrss
+#      - POSTGRES_DB=freshrss
+
+volumes:
+  freshrss_php:
+  freshrss_app:
+  freshrss_db:
+  freshrss_data:
+  freshrss_extensions:
+
+networks:
+  freshrss:
+    external:
+      name: freshrss
