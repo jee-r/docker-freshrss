@@ -1,4 +1,5 @@
 config/
 data/
-docker-compose.yml
+app/
 nginx_default.conf
+docker-compose.yml
